@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>TicTacToe</title>
+  <link rel="stylesheet" href="styles/tictactoe.css">
+</head>
+<body onload="setup()">
+    <h1 style="font-size: 40px" class="center">TicTacToe</h1>
+
+    <h3 id="score-board" class="center"><span style="padding-right:20px;" class="playerX">X</span> <span id="playerX-res">0</span> - <span id="playerO-res">0</span> <span style="padding-left:20px;" class="playerO">O</span></h3>
+
+    <div class="middle" id="board-wrapper">
+        <div id=rows-wrapper>
+            <ul class="board-row" id="left-row">
+                <li id="sq-0"></li>
+                <li id="sq-1"></li>
+                <li id="sq-2"></li>
+            </ul>
+            <ul class="board-row" id="middle-row">
+                <li id="sq-3"></li>
+                <li id="sq-4"></li>
+                <li id="sq-5"></li>
+            </ul>
+            <ul class="board-row" id="right-row">
+                <li id="sq-6"></li>
+                <li id="sq-7"></li>
+                <li id="sq-8"></li>
+            </ul>    
+        </div>
+    </div>
+    <div class="center" id="info-bottom">
+        <h2>Turn</h2>
+        <span id="player">X</span>
+    </div>
+
+    <script src="scripts/tictactoe.js"></script>
+</body>
+</html>
