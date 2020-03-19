@@ -20,6 +20,10 @@ body {
     margin: 0;
     height: 0;
     scroll-behavior: smooth;
+    background-image: url("images/dashb-back.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 /* INDEX PAGE */
