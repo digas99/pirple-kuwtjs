@@ -256,6 +256,11 @@ i {
 
 /* DASHBOARD */
 
+#dashb-container {
+    padding-top: 870px;
+    height: 860px;
+}
+
 /* NAVBAR */
 
 #dashb-navbar-wrapper {
@@ -275,9 +280,61 @@ i {
     padding: 15px;
     color: white;
     font-weight: bold;
+    cursor: pointer;
 }
 
 /* END - NAVBAR */
+
+
+.list-container-wrapper {
+    width: 800px;
+    margin: auto;
+    height: 100px;
+    background-color: white;
+    box-shadow: 0px 5px 20px -4px black;
+    transition: 0.4s;
+    cursor: pointer;
+    margin-bottom: 25px;
+}
+
+.list-container-wrapper:hover {
+    transform: scale(1.018);
+    background-color: #636262;
+    color: white;
+}
+
+#list-container-back { 
+    background-color: white;
+    opacity: 0.7;
+}
+
+.list-container {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    padding-top: 30px;
+}
+
+.list-container li {
+    padding: 10px;
+    overflow: hidden;
+    font-size: 18px;
+}
+
+.list-date {
+    width: 15%;
+    text-align: center;
+}
+
+.list-title {
+    width: 75%;
+    height: 12px;
+}
+
+.list-nmr-items {
+    width: 15%;
+    text-align: center;
+}
 
 /* END - DASHBOARD */
 

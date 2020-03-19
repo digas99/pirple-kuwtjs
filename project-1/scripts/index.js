@@ -4,6 +4,7 @@ const body = document.getElementsByTagName("BODY")[0];
 const storage = window.localStorage;
 let nmrDataObjects;
 let currentUserData = new Object();
+let listsInfo = [ {date: "12/03/2020", title: "Shopping List", nmr: 5}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12} ];
 
 const createPopUp = (width=450, height=550, backcolor="white") => {
     const mask = document.createElement("div");
@@ -349,17 +350,82 @@ const setup = () => {
     nmrDataObjects = parseInt(storage.getItem("nmrDataObjects"));
 }
 
+const createListContainer = (date, title, nmrItems) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "list-container-wrapper";
+
+    const listContainer = document.createElement("ul");
+    listContainer.className = "list-container";
+
+    const l1 = document.createElement("li");
+    l1.className = "list-date";
+    l1.innerText = date;
+    const l2 = document.createElement("li");
+    l2.className = "list-title";
+    l2.innerText = title;
+    const l3 = document.createElement("li");
+    l3.className = "list-nmr-items";
+    l3.innerText = nmrItems;
+
+    wrapper.appendChild(listContainer);
+    listContainer.appendChild(l1);
+    listContainer.appendChild(l2);
+    listContainer.appendChild(l3);
+
+    return wrapper;
+}
+
+let dashboardActive = false;
+
+const setupDashBoard = () => {
+    const dashbContainer = document.createElement("div");
+    dashbContainer.id = "dashb-container";
+    body.appendChild(dashbContainer);
+
+    // Navbar
+    const navbWrapper = document.createElement("div");
+    navbWrapper.id = "dashb-navbar-wrapper";
+    const navbar = document.createElement("ul");
+    navbar.id = "dashb-navbar";
+    const l1 = document.createElement("li");
+    l1.innerText = "Account Settings";
+    const l2 = document.createElement("li");
+    l2.innerText = "Logout";
+
+    dashbContainer.appendChild(navbWrapper);
+    navbWrapper.appendChild(navbar);
+    navbar.appendChild(l1);
+    navbar.appendChild(l2);
+
+    // Lists
+    for (let list of listsInfo) {
+        dashbContainer.appendChild(createListContainer(list.date, list.title, list.nmr));
+    }
+}
+
 const activateHomePageArrow = (e) => {
     if (e.target.id === "homepage-arrow") {
-        const hpArrow = document.getElementById("homepage-arrow");
-
-        hpArrow.addEventListener("click", () => {
-            window.scroll({
-                top: 875,
-                behavior: 'smooth'
-            });
+        setupDashBoard();
+        window.scroll({
+            top: 875,
+            behavior: 'smooth'
         });
+        setTimeout( () => { dashboardActive = true; }, 700);
     }
 }
 
 document.addEventListener("click", activateHomePageArrow);
+
+window.onscroll= (e) => {
+    if (dashboardActive) {
+        console.log(document.documentElement.scrollTop);
+        console.log(document.getElementById("dashb-navbar-wrapper").offsetTop);
+        if (document.documentElement.scrollTop < document.getElementById("dashb-navbar-wrapper").offsetTop+5) {
+            dashboardActive = false;
+            window.scroll({
+                top: 0,
+                behavior: 'smooth'
+            }); 
+        }
+    }
+};
