@@ -24,6 +24,7 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
+    overflow-x: hidden;
 }
 
 /* INDEX PAGE */
@@ -100,6 +101,13 @@ body {
     background-color: white;
 }
 
+.btn-default {
+    box-shadow: inset 0px 0px 0px 3px #1f83ca;
+    border: none;
+    color: #1f83ca;
+    background-color: white;
+}
+
 /* POPUP */
 
 .popup-mask {
@@ -127,9 +135,6 @@ body {
 }
 
 .form-container div label {
-    margin-top: 30px;
-    max-width: 100%;
-    margin-bottom: 5px;
     font-weight: 700;
     font-size: 20px;
 }
@@ -141,7 +146,7 @@ body {
     border: none;
     padding: 5px;
     border-bottom: 1px solid black;
-    font-size: 15px;
+    font-size: 17px;
 }
 
 .btn-submit {
@@ -256,17 +261,15 @@ i {
 
 /* DASHBOARD */
 
-#dashb-container {
-    padding-top: 870px;
-    height: 860px;
-}
-
 /* NAVBAR */
 
 #dashb-navbar-wrapper {
     background-color: #a55858;
     height: 80px;
     width: 100%;
+    position: fixed;
+    transition: 0.5s;
+    z-index: 2;
 }
 
 #dashb-navbar {
@@ -287,7 +290,7 @@ i {
 
 
 .list-container-wrapper {
-    width: 800px;
+    width: 700px;
     margin: auto;
     height: 100px;
     background-color: white;
@@ -335,6 +338,56 @@ i {
     width: 15%;
     text-align: center;
 }
+
+#lists-container {
+    padding-top: 125px;
+}
+
+#no-lists-msg {
+    text-align: center;
+    color: white;
+}
+
+.add-lists-sign {
+    color: white;
+    font-size: 70px;
+    cursor: pointer;
+}
+
+#add-lists-sign-cont {
+    text-align: right;
+    position: fixed;
+    width: 100%;
+    right: 35px;
+    bottom: 20px;
+}
+
+#add-lists-sign-cont-noLists {
+    text-align: center;
+    transition: 0.3s;
+}
+
+#add-lists-sign-cont-noLists:hover {
+    transform: scale(1.1);
+}
+
+/* INSIDE LIST */
+
+#items-container {
+    height: 425px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+#add-new-item-sign {
+    font-size: 40px;
+    margin-left: 15px;
+    margin-top: 5px;
+    cursor: pointer;
+    color: #a55858;
+}
+
+/* END - INSIDE LIST */
 
 /* END - DASHBOARD */
 

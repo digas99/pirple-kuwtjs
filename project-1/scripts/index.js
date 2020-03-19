@@ -4,7 +4,8 @@ const body = document.getElementsByTagName("BODY")[0];
 const storage = window.localStorage;
 let nmrDataObjects;
 let currentUserData = new Object();
-let listsInfo = [ {date: "12/03/2020", title: "Shopping List", nmr: 5}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12}, {date: "13/03/2020", title: "List of things I want to keep", nmr: 12} ];
+let listsInfo = new Array();
+let lists = new Array();
 
 const createPopUp = (width=450, height=550, backcolor="white") => {
     const mask = document.createElement("div");
@@ -19,16 +20,25 @@ const createPopUp = (width=450, height=550, backcolor="white") => {
     window.style.width = width + "px";
     window.style.height = height + "px";
     body.appendChild(window);
+
+    body.style.overflow = "hidden";
+
+    return window;
 }
 
 const leavePopUp = (e) => {
     if (e.target.classList.contains("popup-mask")) {
         body.removeChild(document.getElementById("mask"));
         body.removeChild(document.getElementById("popup"));
+        body.style.overflow = "auto";
     }
 }
 
-const createTextInputBlock = (parent, text, type, placeholder, mandatory, classes) => {
+const createTextInputBlock = (text, type, mandatory, placeholder, classes) => {
+    const wrapper = document.createElement("div");
+    wrapper.style.margin = "15px 0";
+    wrapper.style.display = "grid";
+    
     const label = document.createElement("label");
     label.innerHTML = mandatory ? text + "<span style='color: red;'>*</span>" : text;
     const input = document.createElement("input");
@@ -40,11 +50,34 @@ const createTextInputBlock = (parent, text, type, placeholder, mandatory, classe
     if (classes)
         input.className = classes;
         
-    parent.appendChild(label);
-    parent.appendChild(input);
+    wrapper.appendChild(label);
+    wrapper.appendChild(input);
+
+    return wrapper
 }
 
-const createSubmitButton = (parent, text, form, classes) => {
+const createCheckboxInputBlock = (type, placeholder, classes) => {
+    const wrapper = document.createElement("div");
+    
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "checkbox";
+    const input = document.createElement("input");
+    input.type = type;
+    input.name = type;
+    if (placeholder)
+        input.placeholder = placeholder;
+    
+    if (classes)
+        input.className = classes;
+
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(input);
+
+    return wrapper;
+}
+
+const createSubmitButton = (text, form, classes) => {
     const wrapper = document.createElement("div");
     const button = document.createElement("button");
     button.innerText = text;
@@ -55,7 +88,8 @@ const createSubmitButton = (parent, text, form, classes) => {
         button.className = classes;
 
     wrapper.appendChild(button);
-    parent.appendChild(wrapper);
+    
+    return wrapper;
 }
 
 // FORMS DATA
@@ -67,7 +101,7 @@ document.addEventListener("click", leavePopUp);
 
 // buttons click event
 btnSignin.addEventListener("click", (e) => {
-    createPopUp(450, 700);
+    const popup = createPopUp(450, 700);
 
     const container = document.createElement("div");
     container.style.position = "relative";
@@ -86,10 +120,10 @@ btnSignin.addEventListener("click", (e) => {
     credentials.className = "credentials-wrapper";
     credentials.id = "credentials";
 
-    createTextInputBlock(credentials, "First Name: ", "text", "your first name here...", true);
-    createTextInputBlock(credentials, "Last Name: ", "text", "your last name here...", true);
-    createTextInputBlock(credentials, "Email: ", "email", "example@example.com", true);
-    createTextInputBlock(credentials, "Password: ", "password", "your password here...", true);
+    credentials.appendChild(createTextInputBlock("First Name: ", "text", true, "your first name here..."));
+    credentials.appendChild(createTextInputBlock("Last Name: ", "text", true, "your last name here..."));
+    credentials.appendChild(createTextInputBlock("Email: ", "email", true, "example@example.com"));
+    credentials.appendChild(createTextInputBlock("Password: ", "password", true, "your password here..."));
 
     const touWrapper = document.createElement("div");
     touWrapper.className = "tof-wrapper";
@@ -104,18 +138,18 @@ btnSignin.addEventListener("click", (e) => {
     touWrapper.appendChild(touLabel);
     credentials.appendChild(touWrapper);
     
-    createSubmitButton(credentials, "Sign in", "signinform", "btn-submit btn-signin button");
+    credentials.appendChild(createSubmitButton("Sign in", "signinform", "btn-submit btn-signin button"));
 
     form.appendChild(title);
     form.appendChild(credentials);
 
     container.appendChild(form);
 
-    document.getElementById("popup").appendChild(container);
+    popup.appendChild(container);
 });
 
 btnLogin.addEventListener("click", (e) => {
-    createPopUp(450, 480);
+    const popup = createPopUp(450, 480);
     
     const container = document.createElement("div");
     container.style.position = "relative";
@@ -135,16 +169,16 @@ btnLogin.addEventListener("click", (e) => {
     credentials.className = "credentials-wrapper";
     credentials.id = "credentials";
 
-    createTextInputBlock(credentials, "Email: ", "email", "example@example.com", true);
-    createTextInputBlock(credentials, "Password: ", "password", "your password here...", true);
-    createSubmitButton(credentials, "Login", "loginform", "btn-submit btn-login button");
+    credentials.appendChild(createTextInputBlock("Email: ", "email", true, "example@example.com"));
+    credentials.appendChild(createTextInputBlock("Password: ", "password", true, "your password here..."));
+    credentials.appendChild(createSubmitButton("Login", "loginform", "btn-submit btn-login button"));
 
     form.appendChild(title);
     form.appendChild(credentials);
 
     container.appendChild(form);
 
-    document.getElementById("popup").appendChild(container);
+    popup.appendChild(container);
 });
 
 const container = document.getElementById("container");
@@ -154,8 +188,8 @@ const clearAfterIn = () => {
     body.removeChild(body.children[3]);
     body.removeChild(body.children[2]);
 
-    // remove login and signin buttons
-    container.removeChild(container.children[2]);
+    // main page
+    body.removeChild(document.getElementById("background-image"));
 }
 
 const createNavBar = (name = currentUserData.firstName) => {
@@ -191,16 +225,68 @@ const setupPageLogedIn = () => {
     clearAfterIn();
     createNavBar();
 
-    // add arrow in bottom
-    var arrowWrapper = document.createElement("div");
-    arrowWrapper.id="arrow-wrapper";
+    const removeSquareBrackets = (string) => {
+        let newS = "";
+        let current;
+        for (let i = 0; i < string.length; i++) {
+            current = string.charAt(i);
+            if (current !== '[' && current !== ']') {
+                newS += current;
+            }
+        }
+        return newS;
+    }
 
-    var arrow = document.createElement("i");
-    arrow.id = "homepage-arrow";
-    arrow.className = "down";
+    let infoObject, data, currentLists, info;
+    let listWithItemsInfo;
+    if (data = storage.getItem(currentUserData.email)) {
+        console.log(data);
+        currentLists = data.split("},{");
+        for (let list of currentLists) {
+            listWithItemsInfo = new Array();
+            infoObject = new Object();
+            for (let i of removeExtraCharsFromJSONstringify(list).split(",")) {
+                info = removeSquareBrackets(i);
+                console.log(info);
+                info = info.split(":");
+                const info0 = info[0];
+                const info1 = info[1];
+                if (info0 === "title" || info0 === "date" || info0 === "nElems") {
+                    if (info0 === "title") {
+                        infoObject.title = info1;
+                    }
+                    else if (info0 === "date") {
+                        infoObject.date = info1;
+                    }
+                    else if (info0 === "nElems") {
+                        infoObject.nElems = info1;
+                    }
+                }
+                else {
+                    if (info0 === "items") {
+                        listWithItemsInfo.push(info1);
+                    }
+                    else {
+                        listWithItemsInfo.push(info0);
+                    }
+                }
+            }
+            console.log("list with items info")
+            console.log(listWithItemsInfo);
+            let tmpArray = new Array();
+            for (let i = 0; i < listWithItemsInfo.length; i+=2) {
+                tmpArray.push([listWithItemsInfo[i], listWithItemsInfo[i+1]]);
+            }
+            infoObject.items = tmpArray;
 
-    arrowWrapper.appendChild(arrow);
-    body.appendChild(arrowWrapper);
+            console.log("")
+            listsInfo.push(infoObject);
+            lists.push(infoObject);
+            console.log(lists);
+        }
+    }
+
+    setupDashBoard();
 }
 
 const retreiveData = (e) => {
@@ -340,6 +426,7 @@ document.getElementById("buttons-wrapper").addEventListener("click", (e) => {
     if (e.target.classList.contains("button")) {
         const formContainer = document.getElementById("form-cont"); 
         formContainer.addEventListener("click", retreiveData);
+        body.style.overflow = "auto";
     }
 });
 
@@ -356,6 +443,7 @@ const createListContainer = (date, title, nmrItems) => {
 
     const listContainer = document.createElement("ul");
     listContainer.className = "list-container";
+    listContainer.style.pointerEvents = "none";
 
     const l1 = document.createElement("li");
     l1.className = "list-date";
@@ -375,9 +463,8 @@ const createListContainer = (date, title, nmrItems) => {
     return wrapper;
 }
 
-let dashboardActive = false;
-
 const setupDashBoard = () => {
+    console.log("here");
     const dashbContainer = document.createElement("div");
     dashbContainer.id = "dashb-container";
     body.appendChild(dashbContainer);
@@ -398,34 +485,268 @@ const setupDashBoard = () => {
     navbar.appendChild(l2);
 
     // Lists
-    for (let list of listsInfo) {
-        dashbContainer.appendChild(createListContainer(list.date, list.title, list.nmr));
+    const listsContainer = document.createElement("div");
+    listsContainer.id = "lists-container";
+    dashbContainer.appendChild(listsContainer);
+
+    if (listsInfo.length === 0) {
+        const msg = document.createElement("h3");
+        msg.innerText = "You don't have any lists yet!";
+        msg.id = "no-lists-msg";
+
+        const plusContainer = document.createElement("div");
+        plusContainer.id = "add-lists-sign-cont-noLists";
+        const plus = document.createElement("span");
+        plus.className = "add-lists-sign";
+        plus.innerText = "+";
+        plusContainer.appendChild(plus);
+        
+        listsContainer.appendChild(msg);
+        listsContainer.appendChild(plusContainer);
+    }
+    else {
+        const plusContainer = document.createElement("div");
+        plusContainer.id = "add-lists-sign-cont";
+        const plus = document.createElement("span");
+        plus.className = "add-lists-sign";
+        plus.innerText = "+";
+        plusContainer.appendChild(plus);
+
+        listsContainer.appendChild(plusContainer);
+        for (let list of listsInfo) {
+            listsContainer.appendChild(createListContainer(list.date, list.title, list.nElems));
+           
+        }
     }
 }
-
-const activateHomePageArrow = (e) => {
-    if (e.target.id === "homepage-arrow") {
-        setupDashBoard();
-        window.scroll({
-            top: 875,
-            behavior: 'smooth'
-        });
-        setTimeout( () => { dashboardActive = true; }, 700);
-    }
-}
-
-document.addEventListener("click", activateHomePageArrow);
 
 window.onscroll= (e) => {
-    if (dashboardActive) {
-        console.log(document.documentElement.scrollTop);
-        console.log(document.getElementById("dashb-navbar-wrapper").offsetTop);
-        if (document.documentElement.scrollTop < document.getElementById("dashb-navbar-wrapper").offsetTop+5) {
-            dashboardActive = false;
-            window.scroll({
-                top: 0,
-                behavior: 'smooth'
-            }); 
+    let navbar;
+    if (navbar = document.getElementById("dashb-navbar-wrapper")) {
+        if (document.documentElement.scrollTop > 25) {
+            navbar.style.boxShadow = "0px 1px 6px black";
+            navbar.style.opacity = "0.9";
+        }
+        else {
+            navbar.style.boxShadow = "none";
+            navbar.style.opacity = "1";
         }
     }
 };
+
+const createItem = (text, checked = false) => {
+    const itemWrapper = document.createElement("div");
+    itemWrapper.style.display = "flex";
+
+    const checkbox = createCheckboxInputBlock("text", "item, plan, etc...");
+    checkbox.children[1].style.width = "275px";
+    if (text)
+        checkbox.children[1].value = text;
+    if (checked)
+        checkbox.children[0].checked = true;
+
+    itemWrapper.appendChild(checkbox);
+    const plus = document.createElement("span");
+    plus.innerText = "+";
+    plus.id = "add-new-item-sign";
+    itemWrapper.appendChild(plus);
+
+    return itemWrapper;
+}
+
+const plusButtonAction = (e) => {
+    if (e.target.classList.contains("add-lists-sign")) {
+        const savedTarget = e.target;
+
+        const popup = createPopUp(500, 700);
+        popup.style.top = "70px";
+
+        const container = document.createElement("div");
+
+        const form = document.createElement("form");
+        form.className = "middle form-container";
+        form.id = "new-list-form";
+        form.action = "#";
+
+        const itemsLabel = document.createElement("label");
+        itemsLabel.innerHTML = "Items: <span style='color: red;'>*</span>";
+        itemsLabel.style.fontSize = "20px";
+        itemsLabel.style.fontWeight = "bold";
+
+        const titleLabel = createTextInputBlock("Title: ", "title", false, "title for the list here...");
+        titleLabel.style.display = "inline-block";
+        titleLabel.style.marginBottom = "50px";
+        form.appendChild(titleLabel);
+
+        const itemsContainer = document.createElement("div");
+        itemsContainer.id = "items-container";
+        itemsContainer.appendChild(itemsLabel);
+
+        popup.appendChild(container);
+        container.appendChild(form);
+
+        itemsContainer.appendChild(createItem());
+
+        form.appendChild(itemsContainer);
+
+        form.appendChild(createSubmitButton("Create", "new-list-form", "btn-submit button btn-default"));
+
+        popup.addEventListener("click", (e2) => {
+            if (e2.target.id === "add-new-item-sign") {
+                itemsContainer.children[itemsContainer.children.length-1].removeChild(document.getElementById("add-new-item-sign"));
+                itemsContainer.appendChild(createItem());
+            }
+            else if (e2.target.classList.contains("button")) {
+                e2.preventDefault();
+                const listData = new FormData(document.getElementById("new-list-form"));
+                const dataList = new Array();
+                for (vals of listData) {
+                    if (vals[1])
+                        dataList.push(vals);
+                }
+                console.log(dataList);
+                if ((dataList.length === 1 && dataList[0][0] === "text") || dataList.length > 1) {
+                    let dataObject = new Object();
+                    if (dataList[0][0] !== "title") {
+                        dataObject.title = "Untitled";
+                    }
+                    else {
+                        dataObject.title = dataList[0][1];
+                    }
+                    dataObject.items = new Array();
+                    let countItems = 0;
+                    for (let i = 0; i < dataList.length; i++) {
+
+                        const pushIntoObject = () => {
+                            if (dataList[i-1][0] === "checkbox") {
+                                dataObject.items.push([dataList[i][1], true]);
+                            }
+                            else {
+                                dataObject.items.push([dataList[i][1], false]);
+                            }
+                        }
+
+                        if (dataList[0][0] === "title") {
+                            if (dataList[i][0] === "text") {
+                                countItems++;
+                                pushIntoObject();
+                            }
+                        }
+                        else if (dataList[0][0] === "text") {
+                            if (i === 0) {
+                                countItems++;
+                                dataObject.items.push([dataList[i][1], false]);
+                            }
+                            else {
+                                if (dataList[i][0] === "text") {
+                                    countItems++;
+                                    pushIntoObject();
+                                }
+                            }
+                        }
+                    }
+                    const today = new Date();
+                    const date = today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
+                    dataObject.date = date;
+                    dataObject.nElems = countItems;
+
+                    const listsContainer = document.getElementById("lists-container");
+                    listsContainer.appendChild(createListContainer(date, dataObject.title, countItems));
+                    console.log(dataObject);
+
+                    // remove popup and mask
+                    body.removeChild(body.children[3]);
+                    body.removeChild(body.children[2]);
+
+                    if (listsContainer.children[0].id === "no-lists-msg") {
+                        listsContainer.removeChild(listsContainer.children[1]);
+                        listsContainer.removeChild(listsContainer.children[0]);
+                    }
+
+                    const plusContainer = document.createElement("div");
+                    plusContainer.id = "add-lists-sign-cont";
+                    const plus = document.createElement("span");
+                    plus.className = "add-lists-sign";
+                    plus.innerText = "+";
+                    plusContainer.appendChild(plus);
+                    
+                    listsContainer.appendChild(plusContainer);
+
+                    lists.push(dataObject);
+                    console.log("lists");
+                    console.log(lists);
+
+                    storage.setItem(currentUserData.email, JSON.stringify(lists));
+                    console.log(storage.getItem(currentUserData.email));
+                }
+                else {
+                    alert("You have to add something to your list!");
+                }
+            }
+        });
+    }
+}
+
+const listContainerAction = (e) => {
+    console.log(e.target);
+    const target = e.target;
+    if (target.classList.contains("list-container-wrapper")) {
+        const popup = createPopUp(500, 700);
+        popup.style.top = "70px";
+
+        const container = document.createElement("div");
+
+        const form = document.createElement("form");
+        form.className = "middle form-container";
+        form.id = "new-list-form";
+        form.action = "#";
+
+        const itemsLabel = document.createElement("label");
+        itemsLabel.innerHTML = "Items: <span style='color: red;'>*</span>";
+        itemsLabel.style.fontSize = "20px";
+        itemsLabel.style.fontWeight = "bold";
+
+        const itemsContainer = document.createElement("div");
+        itemsContainer.id = "items-container";
+        itemsContainer.appendChild(itemsLabel);
+
+        popup.appendChild(container);
+        container.appendChild(form);
+
+        for (let list of lists) {
+            const items = list.items;
+            console.log(items);
+            const title = list.title;
+
+            if (target.children[0].children[1].innerText === title) {
+                const titleLabel = createTextInputBlock("Title: ", "title", false, "title for the list here...");
+                titleLabel.style.display = "inline-block";
+                titleLabel.style.marginBottom = "50px";
+                titleLabel.children[1].value = title;
+                form.appendChild(titleLabel);
+
+                for (let item of items) {
+                    console.log("ITEM");
+                    console.log(item);
+                    if (item[1] === "true")
+                        itemsContainer.appendChild(createItem(item[0], true));
+                    else if (item[1] === "false")
+                        itemsContainer.appendChild(createItem(item[0], false));
+                    else if (item[1])
+                        itemsContainer.appendChild(createItem(item[0], true));
+                    else
+                        itemsContainer.appendChild(createItem(item[0], true));
+                }
+            }
+        }
+
+        form.appendChild(itemsContainer);
+
+        form.appendChild(createSubmitButton("Create", "new-list-form", "btn-submit button btn-default"));
+    }
+}
+
+document.addEventListener("click", (e) => {
+    plusButtonAction(e);
+    listContainerAction(e);
+});
