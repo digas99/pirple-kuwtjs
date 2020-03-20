@@ -6,8 +6,9 @@ let nmrDataObjects;
 let currentUserData = new Object();
 let lists = new Array();
 let nmrUntitledLists = 0;
+let oldTitleOnEdit;
 
-const createPopUp = (width=450, height=550, backcolor="white") => {
+const createPopup = (width=450, height=550, backcolor="white") => {
     const mask = document.createElement("div");
     mask.className = "middle popup-mask";
     mask.id = "mask";
@@ -19,6 +20,7 @@ const createPopUp = (width=450, height=550, backcolor="white") => {
     window.style.backgroundColor = backcolor;
     window.style.width = width + "px";
     window.style.height = height + "px";
+    window.style.position = "fixed";
     body.appendChild(window);
 
     body.style.overflow = "hidden";
@@ -26,11 +28,9 @@ const createPopUp = (width=450, height=550, backcolor="white") => {
     return window;
 }
 
-const leavePopUp = (e) => {
+const leavePopup = (e) => {
     if (e.target.classList.contains("popup-mask")) {
-        body.removeChild(document.getElementById("mask"));
-        body.removeChild(document.getElementById("popup"));
-        body.style.overflow = "auto";
+        removePopup();
     }
 }
 
@@ -97,11 +97,10 @@ let loginData;
 let signinData;
 
 // clicking out of the popup
-document.addEventListener("click", leavePopUp);
+document.addEventListener("click", leavePopup);
 
-// buttons click event
-btnSignin.addEventListener("click", (e) => {
-    const popup = createPopUp(450, 700);
+const signinProcess = (e) => {
+    const popup = createPopup(450, 700);
 
     const container = document.createElement("div");
     container.style.position = "relative";
@@ -146,10 +145,10 @@ btnSignin.addEventListener("click", (e) => {
     container.appendChild(form);
 
     popup.appendChild(container);
-});
+}
 
-btnLogin.addEventListener("click", (e) => {
-    const popup = createPopUp(450, 480);
+const loginProcess = (e) => {
+    const popup = createPopup(450, 480);
     
     const container = document.createElement("div");
     container.style.position = "relative";
@@ -179,51 +178,19 @@ btnLogin.addEventListener("click", (e) => {
     container.appendChild(form);
 
     popup.appendChild(container);
-});
+}
+
+// buttons click event
+btnSignin.addEventListener("click", signinProcess);
+btnLogin.addEventListener("click", loginProcess);
 
 const container = document.getElementById("container");
 
-const clearAfterIn = () => {
-    // remove popup and mask
-    body.removeChild(body.children[3]);
-    body.removeChild(body.children[2]);
-
-    // main page
-    body.removeChild(document.getElementById("background-image"));
-}
-
-const createNavBar = (name = currentUserData.firstName) => {
-    const wrapper = document.createElement("div");
-    wrapper.id = "navbar-wrapper";
-
-    const ul = document.createElement("ul");
-    ul.id = "navbar";
-
-    const li1 = document.createElement("li");
-    const li2 = document.createElement("li");
-    const li3 = document.createElement("li");
-
-    li1.id = "greetings-msg";
-    li1.innerText = "Hello, " + name + "!";
-    li2.id = "nbar-settings";
-    li2.innerText = "Settings";
-    li3.id = "nbar-logout";
-    li3.innerText = "Logout";
-
-    container.appendChild(wrapper);
-
-    wrapper.appendChild(ul);
-
-    ul.appendChild(li1);
-    ul.appendChild(document.createElement("div"));
-    ul.appendChild(li2);
-    ul.appendChild(document.createElement("div"));
-    ul.appendChild(li3);
-}
-
 const setupPageLogedIn = () => {
-    clearAfterIn();
-    createNavBar();
+    removePopup();
+ 
+     // main page
+     body.removeChild(document.getElementById("background-image"));
 
     const removeSquareBrackets = (string) => {
         let newS = "";
@@ -240,6 +207,7 @@ const setupPageLogedIn = () => {
     let infoObject, data, currentLists, info;
     let listWithItemsInfo;
     if (data = storage.getItem(currentUserData.email)) {
+        lists = new Array();
         currentLists = data.split("},{");
         for (let list of currentLists) {
             listWithItemsInfo = new Array();
@@ -284,11 +252,28 @@ const setupPageLogedIn = () => {
     setupDashBoard();
 }
 
+const alertMessage = (text, color) => {
+    const wrapper = document.createElement("div");
+    wrapper.style.marginTop = "-30px";
+    wrapper.id = "error-msg";
+
+    const msg = document.createElement("p");
+    msg.style.color = color;
+    msg.innerText = text;
+
+    wrapper.appendChild(msg);
+
+    return wrapper;
+}
+
 const retreiveData = (e) => {
     let dataList, vals, dataObject, userData, params, storedUserInputs, filteredUserData, param, i;
     if (e.target.value === "submit") {
         e.preventDefault();
         const formElem = e.target.parentNode.parentNode.parentNode;
+        let errorMsg;
+        if ((errorMsg = document.getElementById("error-msg")))
+            formElem.removeChild(errorMsg);
         switch (formElem.id.split("form")[0]) {
             case "signin":
                 signinData = new FormData(document.getElementById("signinform"));
@@ -332,15 +317,15 @@ const retreiveData = (e) => {
 
                         }
                         else {
-                            alert("There is already an account registered with that email!");
+                            formElem.insertBefore(alertMessage("There is already an account registered with that email!", "red"), document.getElementById("credentials"));
                         }
                     }
                     else {
-                        alert("You have to fill in all mandatory fields marked with *!");
+                        formElem.insertBefore(alertMessage("You have to fill in all mandatory fields marked with *", "red"), document.getElementById("credentials"));
                     }
                 }
                 else {
-                    alert("You need to agree to the Terms of Use!");
+                    formElem.insertBefore(alertMessage("You need to agree to the Terms of Use!", "red"), document.getElementById("credentials"));
                 }
                 break;
             case "login":
@@ -382,15 +367,15 @@ const retreiveData = (e) => {
                         }
                     }
                     if (!foundEmail) {
-                        alert("There is no account with that email!");
+                        formElem.insertBefore(alertMessage("There is no account with that email!", "red"), document.getElementById("credentials"));
                     }
                     else if (!correctPass) {
-                        alert("Wrong password!");
+                        formElem.insertBefore(alertMessage("Wrong password!", "red"), document.getElementById("credentials"));
                     }
                     
                 }
                 else {
-                    alert("You have to fill in all mandatory fields marked with *!");
+                    formElem.insertBefore(alertMessage("You have to fill in all mandatory fields marked with *", "red"), document.getElementById("credentials"));
                 }
                 break;
         }
@@ -414,7 +399,6 @@ document.getElementById("buttons-wrapper").addEventListener("click", (e) => {
     if (e.target.classList.contains("button")) {
         const formContainer = document.getElementById("form-cont"); 
         formContainer.addEventListener("click", retreiveData);
-        body.style.overflow = "auto";
     }
 });
 
@@ -461,13 +445,19 @@ const setupDashBoard = () => {
     navbWrapper.id = "dashb-navbar-wrapper";
     const navbar = document.createElement("ul");
     navbar.id = "dashb-navbar";
+    const l0 = document.createElement("li");
+    l0.innerText = "Hello, " + currentUserData.firstName + "!";
+    l0.style.cursor = "default";
     const l1 = document.createElement("li");
     l1.innerText = "Account Settings";
+    l1.id = "settings";
     const l2 = document.createElement("li");
     l2.innerText = "Logout";
+    l2.id = "logout";
 
     dashbContainer.appendChild(navbWrapper);
     navbWrapper.appendChild(navbar);
+    navbar.appendChild(l0);
     navbar.appendChild(l1);
     navbar.appendChild(l2);
 
@@ -551,7 +541,7 @@ const plusButtonAction = (e) => {
     if (e.target.classList.contains("add-lists-sign")) {
         const savedTarget = e.target;
 
-        const popup = createPopUp(500, 700);
+        const popup = createPopup(500, 700);
         popup.style.top = "70px";
 
         const container = document.createElement("div");
@@ -616,9 +606,7 @@ const plusButtonAction = (e) => {
                     if (!titleExists) {
                         sendListToStorage(dataList, dataObject);
 
-                        // remove popup and mask
-                        body.removeChild(body.children[3]);
-                        body.removeChild(body.children[2]);
+                        removePopup();
                     }
                     else {
                         alert("There is a list with that same name already!");
@@ -635,7 +623,7 @@ const plusButtonAction = (e) => {
 const listContainerAction = (e) => {
     const target = e.target;
     if (target.classList.contains("list-container-wrapper")) {
-        const popup = createPopUp(500, 700);
+        const popup = createPopup(500, 700);
         popup.style.top = "70px";
 
         const container = document.createElement("div");
@@ -661,7 +649,8 @@ const listContainerAction = (e) => {
             const items = list.items;
             const title = list.title;
 
-            if (target.children[0].children[1].innerText === title) {
+            oldTitleOnEdit = target.children[0].children[1].innerText;
+            if (oldTitleOnEdit === title) {
                 const titleLabel = createTextInputBlock("Title: ", "title", false, "Untitled " + nmrUntitledLists);
                 titleLabel.style.display = "inline-block";
                 titleLabel.style.marginBottom = "50px";
@@ -713,14 +702,12 @@ const listContainerAction = (e) => {
                         dataObject.title = dataList[0][1];
                     }
                     
-                    lists = listRemove(dataObject.title);
+                    lists = listRemove(oldTitleOnEdit);
                     document.getElementById("lists-container").removeChild(target);
 
                     sendListToStorage(dataList, dataObject);
 
-                    // remove popup and mask
-                    body.removeChild(body.children[3]);
-                    body.removeChild(body.children[2]);
+                    removePopup();
                 }
                 else {
                     alert("You have to add something to your list!");
@@ -734,14 +721,10 @@ const listContainerAction = (e) => {
                         nmrUntitledLists--
                     lists = listRemove(titleToRemove);
                     document.getElementById("lists-container").removeChild(target);
-                    console.log("lists");
-                    console.log(lists);
 
                     storage.setItem(currentUserData.email, JSON.stringify(lists));
                     
-                    // remove popup and mask
-                    body.removeChild(body.children[3]);
-                    body.removeChild(body.children[2]);
+                    removePopup();
                 }
             }
         });
@@ -818,7 +801,150 @@ function sendListToStorage(list, dataObject) {
     storage.setItem(currentUserData.email, JSON.stringify(lists));
 }
 
+function removePopup() {
+    // remove popup and mask
+    body.removeChild(body.children[3]);
+    body.removeChild(body.children[2]);
+    body.style.overflowY = "auto";
+}
+
+const settingsAction = (e) => {
+    if (e.target.id === "settings") {
+        const popup = createPopup();
+
+        const form = document.createElement("form");
+        form.id = "settingsform";
+        form.action = "#";
+        form.className = "middle form-container";
+        popup.appendChild(form);
+
+        const titleWrapper = document.createElement("div");
+        titleWrapper.style.marginBottom = "60px";
+        const title = document.createElement("label");
+        title.innerText = "Account Settings";
+        title.style.fontSize = "24px";
+        titleWrapper.appendChild(title);
+        form.appendChild(titleWrapper);
+
+        const seetingTitleWrapper = document.createElement("div");
+        seetingTitleWrapper.id = "setting-title";
+        seetingTitleWrapper.style.marginBottom = "30px";
+        const seetingTitle = document.createElement("label");
+        seetingTitle.style.fontSize = "22px";
+        seetingTitle.innerText = "Change Password";
+        seetingTitleWrapper.appendChild(seetingTitle);
+        form.appendChild(seetingTitleWrapper);
+
+        form.appendChild(createTextInputBlock("Old Password: ", "password", true, "your old password here..."));
+        form.appendChild(createTextInputBlock("New Password: ", "password", true, "your new password here..."));
+        form.appendChild(createTextInputBlock("New Password (again): ", "password", true, "your new password here..."));
+        form.appendChild(createSubmitButton("Change", "settingsform", "btn-submit button btn-default"));
+
+        popup.addEventListener("click", (e2) => {
+            if (e2.target.classList.contains("btn-default")) {
+                e2.preventDefault();
+                let errorMsg;
+                if ((errorMsg = document.getElementById("error-msg")))
+                    form.removeChild(errorMsg);
+
+                const listData = new FormData(document.getElementById("settingsform"));
+                const dataList = new Array();
+                for (vals of listData) {
+                    if (vals[1])
+                        dataList.push(vals);
+                }
+
+                if (dataList.length === 3) {
+                    if (dataList[0][1] === currentUserData.pass) {
+                        if (dataList[1][1] === dataList[2][1]) {
+                            for (let i = 0; i < nmrDataObjects; i++) {
+                                const storageVals = removeExtraCharsFromJSONstringify(storage.getItem("user"+i));
+                                if (storageVals.split(",")[2].split(":")[1] === currentUserData.email) {
+                                    storage.removeItem("user"+i);
+                                    currentUserData.pass = dataList[1][1];
+                                    storage.setItem("user"+i, JSON.stringify(currentUserData));
+                                    const msg = alertMessage("Password changed successfully!", "green");
+                                    msg.children[0].style.color = "green !important";
+                                    form.insertBefore(msg, document.getElementById("setting-title"));
+                                }
+                            }
+                        }
+                        else {
+                            form.insertBefore(alertMessage("The new password is not the same when typed again!", "red"), document.getElementById("setting-title"));
+                        }
+                    }
+                    else {
+                        form.insertBefore(alertMessage("The old password is not correct!", "red"), document.getElementById("setting-title"));
+                    }
+                }
+                else {
+                    form.insertBefore(alertMessage("You have to fill in all mandatory fields marked with *", "red"), document.getElementById("setting-title"));
+                }
+            }
+        });
+    }
+    else if (e.target.id === "logout") {
+        body.removeChild(document.getElementById("dashb-container"));
+
+        // retrieve signin/login page
+        const back = document.createElement("div");
+        back.id = "background-image";
+        body.appendChild(back);
+
+        const mask = document.createElement("div");
+        mask.className = "middle";
+        mask.id = "background-mask";
+        back.appendChild(mask);
+
+        const mid = document.createElement("div");
+        mid.className = "middle center";
+        mid.id = "container";
+        back.appendChild(mid);
+
+        const title = document.createElement("h1");
+        title.id = "title";
+        title.innerText = "To-do List";
+        mid.appendChild(title);
+
+        const subtitle = document.createElement("h3");
+        subtitle.id = "subtitle";
+        subtitle.innerText = "Keep track of what you have to-do!";
+        mid.appendChild(subtitle);
+
+        const btnWrapper = document.createElement("div");
+        btnWrapper.id = "buttons-wrapper";
+        mid.appendChild(btnWrapper);
+
+        const btnSignin = document.createElement("button");
+        btnSignin.className = "btn-signin button";
+        btnSignin.id = "signin";
+        btnSignin.innerText = "Sign Up";
+        btnWrapper.appendChild(btnSignin);
+
+        const separator = document.createElement("div");
+        btnWrapper.appendChild(separator);
+
+        const btnLogin = document.createElement("button");
+        btnLogin.className = "btn-login button";
+        btnLogin.id = "login";
+        btnLogin.innerText = "Log In";
+        btnWrapper.appendChild(btnLogin);
+
+        // buttons click event
+        btnSignin.addEventListener("click", signinProcess);
+        btnLogin.addEventListener("click", loginProcess);
+
+        document.getElementById("buttons-wrapper").addEventListener("click", (e) => {
+            if (e.target.classList.contains("button")) {
+                const formContainer = document.getElementById("form-cont"); 
+                formContainer.addEventListener("click", retreiveData);
+            }
+        });
+    }
+}
+
 document.addEventListener("click", (e) => {
     plusButtonAction(e);
     listContainerAction(e);
+    settingsAction(e);
 });

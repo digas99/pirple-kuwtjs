@@ -120,6 +120,7 @@ body {
 .popup-mask {
     background-color: black;
     opacity: 0.6;
+    position: fixed;
 }
 
 /* END - POPUP */
@@ -364,7 +365,6 @@ i {
 #add-lists-sign-cont {
     text-align: right;
     position: fixed;
-    width: 100%;
     right: 35px;
     bottom: 20px;
 }
