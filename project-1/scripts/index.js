@@ -4,8 +4,8 @@ const body = document.getElementsByTagName("BODY")[0];
 const storage = window.localStorage;
 let nmrDataObjects;
 let currentUserData = new Object();
-let listsInfo = new Array();
 let lists = new Array();
+let nmrUntitledLists = 0;
 
 const createPopUp = (width=450, height=550, backcolor="white") => {
     const mask = document.createElement("div");
@@ -240,19 +240,19 @@ const setupPageLogedIn = () => {
     let infoObject, data, currentLists, info;
     let listWithItemsInfo;
     if (data = storage.getItem(currentUserData.email)) {
-        console.log(data);
         currentLists = data.split("},{");
         for (let list of currentLists) {
             listWithItemsInfo = new Array();
             infoObject = new Object();
             for (let i of removeExtraCharsFromJSONstringify(list).split(",")) {
                 info = removeSquareBrackets(i);
-                console.log(info);
                 info = info.split(":");
                 const info0 = info[0];
                 const info1 = info[1];
                 if (info0 === "title" || info0 === "date" || info0 === "nElems") {
                     if (info0 === "title") {
+                        if (info1.split(" ")[0] === "Untitled")
+                            nmrUntitledLists++;
                         infoObject.title = info1;
                     }
                     else if (info0 === "date") {
@@ -271,18 +271,13 @@ const setupPageLogedIn = () => {
                     }
                 }
             }
-            console.log("list with items info")
-            console.log(listWithItemsInfo);
+
             let tmpArray = new Array();
             for (let i = 0; i < listWithItemsInfo.length; i+=2) {
                 tmpArray.push([listWithItemsInfo[i], listWithItemsInfo[i+1]]);
             }
             infoObject.items = tmpArray;
-
-            console.log("")
-            listsInfo.push(infoObject);
             lists.push(infoObject);
-            console.log(lists);
         }
     }
 
@@ -308,8 +303,6 @@ const retreiveData = (e) => {
                         for (i = 0; i < nmrDataObjects; i++) {
                             userData = storage.getItem("user"+i);
                             params = userData.split(",");
-                            //console.log("");
-                            //console.log(params)
                             storedUserInputs = new Array();
                             for (param of params) {
                                 filteredUserData = param.split(":");
@@ -332,7 +325,6 @@ const retreiveData = (e) => {
                             currentUserData.lastName = dataObject.lastName;
                             currentUserData.email = dataObject.email;
                             currentUserData.pass = dataObject.pass;
-                            console.log(dataObject);
                             storage.setItem("user"+nmrDataObjects, JSON.stringify(dataObject));
                             storage.setItem("nmrDataObjects", ++nmrDataObjects);
                             
@@ -368,14 +360,12 @@ const retreiveData = (e) => {
                     for (i = 0; i < nmrDataObjects; i++) {
                         userData = storage.getItem("user"+i);
                         params = userData.split(",");
-                        //console.log("");
-                        //console.log(params)
                         storedUserInputs = new Array();
                         for (param of params) {
                             filteredUserData = param.split(":");
                             storedUserInputs.push(removeExtraCharsFromJSONstringify(filteredUserData[1]));
                         }
-                        //console.log(userInputs);
+
                         if (dataObject.email === storedUserInputs[2]) {
                             foundEmail = true;
                             if (dataObject.pass === storedUserInputs[3]) {
@@ -384,8 +374,6 @@ const retreiveData = (e) => {
                                 currentUserData.lastName = storedUserInputs[1];
                                 currentUserData.email = storedUserInputs[2];
                                 currentUserData.pass = storedUserInputs[3];
-                                //console.log("current user data");
-                                //console.log(currentUserData);
                                 
                                 setupPageLogedIn();
 
@@ -464,7 +452,6 @@ const createListContainer = (date, title, nmrItems) => {
 }
 
 const setupDashBoard = () => {
-    console.log("here");
     const dashbContainer = document.createElement("div");
     dashbContainer.id = "dashb-container";
     body.appendChild(dashbContainer);
@@ -489,7 +476,8 @@ const setupDashBoard = () => {
     listsContainer.id = "lists-container";
     dashbContainer.appendChild(listsContainer);
 
-    if (listsInfo.length === 0) {
+    //if (listsInfo.length === 0) {
+    if (lists.length === 0 || (lists.length === 1  && !lists[0].title)) {
         const msg = document.createElement("h3");
         msg.innerText = "You don't have any lists yet!";
         msg.id = "no-lists-msg";
@@ -513,8 +501,10 @@ const setupDashBoard = () => {
         plusContainer.appendChild(plus);
 
         listsContainer.appendChild(plusContainer);
-        for (let list of listsInfo) {
-            listsContainer.appendChild(createListContainer(list.date, list.title, list.nElems));
+        //for (let list of listsInfo) {
+        for (let list of lists) {
+            if (list.title)
+                listsContainer.appendChild(createListContainer(list.date, list.title, list.nElems));
            
         }
     }
@@ -534,7 +524,7 @@ window.onscroll= (e) => {
     }
 };
 
-const createItem = (text, checked = false) => {
+const createItem = (text, lastItem, checked = false) => {
     const itemWrapper = document.createElement("div");
     itemWrapper.style.display = "flex";
 
@@ -546,10 +536,13 @@ const createItem = (text, checked = false) => {
         checkbox.children[0].checked = true;
 
     itemWrapper.appendChild(checkbox);
-    const plus = document.createElement("span");
-    plus.innerText = "+";
-    plus.id = "add-new-item-sign";
-    itemWrapper.appendChild(plus);
+
+    if (lastItem) {
+        const plus = document.createElement("span");
+        plus.innerText = "+";
+        plus.id = "add-new-item-sign";
+        itemWrapper.appendChild(plus);   
+    }
 
     return itemWrapper;
 }
@@ -585,7 +578,7 @@ const plusButtonAction = (e) => {
         popup.appendChild(container);
         container.appendChild(form);
 
-        itemsContainer.appendChild(createItem());
+        itemsContainer.appendChild(createItem(false, true));
 
         form.appendChild(itemsContainer);
 
@@ -594,7 +587,7 @@ const plusButtonAction = (e) => {
         popup.addEventListener("click", (e2) => {
             if (e2.target.id === "add-new-item-sign") {
                 itemsContainer.children[itemsContainer.children.length-1].removeChild(document.getElementById("add-new-item-sign"));
-                itemsContainer.appendChild(createItem());
+                itemsContainer.appendChild(createItem(false, true));
             }
             else if (e2.target.classList.contains("button")) {
                 e2.preventDefault();
@@ -604,80 +597,32 @@ const plusButtonAction = (e) => {
                     if (vals[1])
                         dataList.push(vals);
                 }
-                console.log(dataList);
                 if ((dataList.length === 1 && dataList[0][0] === "text") || dataList.length > 1) {
                     let dataObject = new Object();
                     if (dataList[0][0] !== "title") {
-                        dataObject.title = "Untitled";
+                        dataObject.title = "Untitled "+(nmrUntitledLists++);
                     }
                     else {
                         dataObject.title = dataList[0][1];
                     }
-                    dataObject.items = new Array();
-                    let countItems = 0;
-                    for (let i = 0; i < dataList.length; i++) {
-
-                        const pushIntoObject = () => {
-                            if (dataList[i-1][0] === "checkbox") {
-                                dataObject.items.push([dataList[i][1], true]);
-                            }
-                            else {
-                                dataObject.items.push([dataList[i][1], false]);
-                            }
-                        }
-
-                        if (dataList[0][0] === "title") {
-                            if (dataList[i][0] === "text") {
-                                countItems++;
-                                pushIntoObject();
-                            }
-                        }
-                        else if (dataList[0][0] === "text") {
-                            if (i === 0) {
-                                countItems++;
-                                dataObject.items.push([dataList[i][1], false]);
-                            }
-                            else {
-                                if (dataList[i][0] === "text") {
-                                    countItems++;
-                                    pushIntoObject();
-                                }
-                            }
-                        }
-                    }
-                    const today = new Date();
-                    const date = today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
-                    dataObject.date = date;
-                    dataObject.nElems = countItems;
-
-                    const listsContainer = document.getElementById("lists-container");
-                    listsContainer.appendChild(createListContainer(date, dataObject.title, countItems));
-                    console.log(dataObject);
-
-                    // remove popup and mask
-                    body.removeChild(body.children[3]);
-                    body.removeChild(body.children[2]);
-
-                    if (listsContainer.children[0].id === "no-lists-msg") {
-                        listsContainer.removeChild(listsContainer.children[1]);
-                        listsContainer.removeChild(listsContainer.children[0]);
-                    }
-
-                    const plusContainer = document.createElement("div");
-                    plusContainer.id = "add-lists-sign-cont";
-                    const plus = document.createElement("span");
-                    plus.className = "add-lists-sign";
-                    plus.innerText = "+";
-                    plusContainer.appendChild(plus);
                     
-                    listsContainer.appendChild(plusContainer);
+                    let titleExists = false;
+                    for (let l of lists) {
+                        if (dataObject.title === l.title) {
+                            titleExists = true;
+                        }
+                    }
 
-                    lists.push(dataObject);
-                    console.log("lists");
-                    console.log(lists);
+                    if (!titleExists) {
+                        sendListToStorage(dataList, dataObject);
 
-                    storage.setItem(currentUserData.email, JSON.stringify(lists));
-                    console.log(storage.getItem(currentUserData.email));
+                        // remove popup and mask
+                        body.removeChild(body.children[3]);
+                        body.removeChild(body.children[2]);
+                    }
+                    else {
+                        alert("There is a list with that same name already!");
+                    } 
                 }
                 else {
                     alert("You have to add something to your list!");
@@ -688,7 +633,6 @@ const plusButtonAction = (e) => {
 }
 
 const listContainerAction = (e) => {
-    console.log(e.target);
     const target = e.target;
     if (target.classList.contains("list-container-wrapper")) {
         const popup = createPopUp(500, 700);
@@ -715,7 +659,6 @@ const listContainerAction = (e) => {
 
         for (let list of lists) {
             const items = list.items;
-            console.log(items);
             const title = list.title;
 
             if (target.children[0].children[1].innerText === title) {
@@ -724,26 +667,155 @@ const listContainerAction = (e) => {
                 titleLabel.style.marginBottom = "50px";
                 titleLabel.children[1].value = title;
                 form.appendChild(titleLabel);
-
+                let c = 0;
+                let plusValue = false;
                 for (let item of items) {
-                    console.log("ITEM");
-                    console.log(item);
+                    if (c === items.length-1) {
+                        plusValue = true;
+                    }
+                    c++;
                     if (item[1] === "true")
-                        itemsContainer.appendChild(createItem(item[0], true));
+                        itemsContainer.appendChild(createItem(item[0], plusValue, true));
                     else if (item[1] === "false")
-                        itemsContainer.appendChild(createItem(item[0], false));
+                        itemsContainer.appendChild(createItem(item[0], plusValue, false));
                     else if (item[1])
-                        itemsContainer.appendChild(createItem(item[0], true));
+                        itemsContainer.appendChild(createItem(item[0], plusValue, true));
                     else
-                        itemsContainer.appendChild(createItem(item[0], true));
+                        itemsContainer.appendChild(createItem(item[0], plusValue, false));
                 }
             }
         }
 
         form.appendChild(itemsContainer);
 
-        form.appendChild(createSubmitButton("Create", "new-list-form", "btn-submit button btn-default"));
+        form.appendChild(createSubmitButton("Delete", "new-list-form", "btn-submit button btn-delete"));
+        form.appendChild(createSubmitButton("Edit", "new-list-form", "btn-submit button btn-default"));
+        
+        popup.addEventListener("click", (e2) => {
+            if (e2.target.id === "add-new-item-sign") {
+                itemsContainer.children[itemsContainer.children.length-1].removeChild(document.getElementById("add-new-item-sign"));
+                itemsContainer.appendChild(createItem(false, true));
+            }
+            else if (e2.target.classList.contains("btn-default")) {
+                e2.preventDefault();
+                const listData = new FormData(document.getElementById("new-list-form"));
+                const dataList = new Array();
+                for (vals of listData) {
+                    if (vals[1])
+                        dataList.push(vals);
+                }
+                if ((dataList.length === 1 && dataList[0][0] === "text") || dataList.length > 1) {
+                    let dataObject = new Object();
+                    if (dataList[0][0] !== "title") {
+                        dataObject.title = "Untitled "+(nmrUntitledLists++);
+                    }
+                    else {
+                        dataObject.title = dataList[0][1];
+                    }
+                    
+                    lists = listRemove(dataObject.title);
+                    document.getElementById("lists-container").removeChild(target);
+
+                    sendListToStorage(dataList, dataObject);
+
+                    // remove popup and mask
+                    body.removeChild(body.children[3]);
+                    body.removeChild(body.children[2]);
+                }
+                else {
+                    alert("You have to add something to your list!");
+                }
+            }
+            else if (e2.target.classList.contains("btn-delete")) {
+                e2.preventDefault();
+                const titleToRemove = target.children[0].children[1].innerText;
+                if (confirm("Are you sure you want to remove " + titleToRemove + "?")) {
+                    if (titleToRemove.split(" ")[0] === "Untitled" && titleToRemove.split(" ")[1] === ""+(nmrUntitledLists-1))
+                        nmrUntitledLists--
+                    lists = listRemove(titleToRemove);
+                    document.getElementById("lists-container").removeChild(target);
+                    console.log("lists");
+                    console.log(lists);
+
+                    storage.setItem(currentUserData.email, JSON.stringify(lists));
+                    
+                    // remove popup and mask
+                    body.removeChild(body.children[3]);
+                    body.removeChild(body.children[2]);
+                }
+            }
+        });
     }
+}
+
+function listRemove(title) {
+    let newList = new Array();
+    for (let l of lists) {
+        if (l.title !== title) {
+            newList.push(l);
+        }
+    }
+    return newList;
+}
+
+function sendListToStorage(list, dataObject) {
+    dataObject.items = new Array();
+    let countItems = 0;
+    for (let i = 0; i < list.length; i++) {
+
+        const pushIntoObject = () => {
+            if (list[i-1][0] === "checkbox") {
+                dataObject.items.push([list[i][1], true]);
+            }
+            else {
+                dataObject.items.push([list[i][1], false]);
+            }
+        }
+
+        if (list[0][0] === "title") {
+            if (list[i][0] === "text") {
+                countItems++;
+                pushIntoObject();
+            }
+        }
+        else if (list[0][0] === "text") {
+            if (i === 0) {
+                countItems++;
+                dataObject.items.push([list[i][1], false]);
+            }
+            else {
+                if (list[i][0] === "text") {
+                    countItems++;
+                    pushIntoObject();
+                }
+            }
+        }
+    }
+    const today = new Date();
+    const date = today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
+    dataObject.date = date;
+    dataObject.nElems = countItems;
+
+    const listsContainer = document.getElementById("lists-container");
+    listsContainer.appendChild(createListContainer(date, dataObject.title, countItems));
+
+    if (listsContainer.children[0].id === "no-lists-msg") {
+        listsContainer.removeChild(listsContainer.children[1]);
+        listsContainer.removeChild(listsContainer.children[0]);
+    }
+
+    const plusContainer = document.createElement("div");
+    plusContainer.id = "add-lists-sign-cont";
+    const plus = document.createElement("span");
+    plus.className = "add-lists-sign";
+    plus.innerText = "+";
+    plusContainer.appendChild(plus);
+    
+    listsContainer.appendChild(plusContainer);
+
+    lists.push(dataObject);
+
+    storage.setItem(currentUserData.email, JSON.stringify(lists));
 }
 
 document.addEventListener("click", (e) => {

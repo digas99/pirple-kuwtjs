@@ -108,6 +108,13 @@ body {
     background-color: white;
 }
 
+.btn-delete {
+    box-shadow: inset 0px 0px 0px 3px red;
+    border: none;
+    color:red;
+    background-color: white;
+}
+
 /* POPUP */
 
 .popup-mask {
