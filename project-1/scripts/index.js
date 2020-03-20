@@ -252,7 +252,7 @@ const setupPageLogedIn = () => {
                 if (info0 === "title" || info0 === "date" || info0 === "nElems") {
                     if (info0 === "title") {
                         if (info1.split(" ")[0] === "Untitled")
-                            nmrUntitledLists++;
+                            nmrUntitledLists = parseInt(info1.split(" ")[1])+1;
                         infoObject.title = info1;
                     }
                     else if (info0 === "date") {
@@ -566,7 +566,7 @@ const plusButtonAction = (e) => {
         itemsLabel.style.fontSize = "20px";
         itemsLabel.style.fontWeight = "bold";
 
-        const titleLabel = createTextInputBlock("Title: ", "title", false, "title for the list here...");
+        const titleLabel = createTextInputBlock("Title: ", "title", false, "Untitled " + nmrUntitledLists);
         titleLabel.style.display = "inline-block";
         titleLabel.style.marginBottom = "50px";
         form.appendChild(titleLabel);
@@ -662,7 +662,7 @@ const listContainerAction = (e) => {
             const title = list.title;
 
             if (target.children[0].children[1].innerText === title) {
-                const titleLabel = createTextInputBlock("Title: ", "title", false, "title for the list here...");
+                const titleLabel = createTextInputBlock("Title: ", "title", false, "Untitled " + nmrUntitledLists);
                 titleLabel.style.display = "inline-block";
                 titleLabel.style.marginBottom = "50px";
                 titleLabel.children[1].value = title;
