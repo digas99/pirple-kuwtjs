@@ -2,7 +2,7 @@ const boardWrapper = document.getElementById("board-wrapper");
 const listLIs = boardWrapper.querySelectorAll("li");
 const body = document.getElementsByTagName("BODY")[0];
 
-let squares = ["", "", "", "", "", "", "", "", ""];
+let squares = new Array(9).fill("");
 let player = 0;
 const colors = ["f75454", "424242"];
 const symbols = ['X', 'O'];
