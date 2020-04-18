@@ -1,0 +1,56 @@
+@font-face {
+    font-family: "SevenSegmentRegular";
+  
+    src: url("./fonts/SevenSegment.woff") format("woff"), /* Modern Browsers */
+      url("./fonts/SevenSegment.woff2") format("woff2"); /* Modern Browsers */
+    font-weight: normal;
+    font-style: normal;
+}
+
+p {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.calculator-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid black;
+    border-radius: 3px;
+    background-color: #0fa20f;
+}
+
+button {
+    font-size: 70px;
+    width: 80px;
+}
+
+.buttons {
+    display: inline-flex;
+    border-top: 1.5px solid black;
+}
+
+.operators>div {
+    display: grid;
+}
+
+.screen {
+    text-align: right;
+    margin-right: 5px;
+    font-family: 'SevenSegmentRegular';
+    font-weight: bold;
+    font-size: 60px;
+    width: 315px;
+    overflow-x: auto;
+}
+
+.space {
+    padding-left: 5px;
+}
+
+#title {
+    text-align: center;
+    font-size: 65px;
+}
