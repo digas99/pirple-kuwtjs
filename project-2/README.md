@@ -6,7 +6,7 @@ To run the codes do the following, after installing Node.js:
 ```
 npx create-react-app my-app
 ```
-- Replace files from *my-app/src/* with the files inside one of the *code#* folders
+- Replace files from **my-app/src/** with the files inside one of the **code#** folders
 - Run the following command to host the React app on localhost:
 ```
 npm start
