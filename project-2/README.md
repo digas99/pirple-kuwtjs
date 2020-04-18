@@ -1,4 +1,4 @@
-# Keeping Up With the JavaScripts
+# Keeping Up With the JavaScripts - Project-2
 
 To run the codes do the following, after installing Node.js:
 - Run the following command in the directory you want:
