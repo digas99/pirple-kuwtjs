@@ -1,0 +1,197 @@
+#title {
+    text-align: center;
+}
+
+.center-block {
+    margin: auto;
+    left: 0;
+    right: 0;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+i {
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 7px;
+}
+
+.up {
+    transform: rotate(225deg);
+    -webkit-transform: rotate(225deg);
+}
+
+.down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}
+
+.fade {
+    transform: 0.4s;
+    opacity: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+/* STRUCTURE */
+
+#nmr-people-input {
+    width: 45px;
+    padding: 3px 5px;
+}
+
+#settings-wrapper > ul {
+    display: flex;
+    margin: auto;
+    width: 198px;
+}
+
+#settings-wrapper > ul > li {
+    padding: 10px;
+    font-weight: bold;
+}
+
+#building {
+    padding: 25px;
+}
+
+#building > li {
+    border-bottom: 2px solid black;
+    padding: 14px 15px;
+    font-weight: bold;
+    display: flex;
+    cursor: pointer;
+    transition: 0.4s;
+    position: relative;
+}
+
+#building > li:hover {
+    background-color: #fdd7d7;
+}
+
+#building > li > div {
+    overflow: hidden;
+    position: relative;
+    margin-bottom: -15px;
+    width: 55%;
+}
+
+.people-wrapper {
+    display: flex;
+    left: 50px;
+    position: absolute;
+}
+
+.people-wrapper > li > img {
+    width: 25px;
+    height: 30px;
+}
+
+#structure {
+    width: 500px;
+    border: 2px solid black; 
+    position: relative;
+    overflow: hidden;
+}
+
+.person {
+    transition: 0.5s;
+}
+
+.person-go-right {
+    margin-left: 185px;
+}
+
+/* ELEVATOR */
+.elevator-container {
+    width: 84px;
+    position: absolute;
+    padding-right: 50px;
+    top: 503px;
+    margin: auto;
+    right: 0;
+    transition: 4s;
+}
+
+.elevator {
+    height: 36px;
+    background-color: gray;
+    width: 70px;
+    border: 2px solid black;
+    cursor: pointer;
+    transition: 0.4s;
+    color: white;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    padding-top: 10px;
+}
+
+.elevator:hover, .elevator:active {
+    background-color: #c33c3c;
+}
+
+.elevator-wrapper {
+    display: flex;
+    float: right;
+    margin-right: 5px;
+    position: relative;
+}
+
+.left-elevator-number {
+    position: absolute;
+    top: -20px;
+    left: 33px;
+    color: red;
+    font-weight: bold;
+    transition: 0.4s;
+}
+
+.elevator-active {
+    background-color: gray;
+    box-shadow: 0px 0px 10px 2px yellow;
+    color: #fdfda0;
+}
+
+/* Console */
+#console-container {
+    position: relative;
+    width: 504px;
+    height: 285px;
+    margin: auto;
+    margin-top: 20px;
+    overflow: auto;
+    background-image: url(images/console.png);
+    cursor: pointer;
+}
+
+#console-wrapper {
+    overflow: auto;
+    position: relative;
+    height: 255px;
+    top: 30px;
+}
+
+#logs-wrapper {
+    position: absolute;
+    left: 15px;
+    top: 10px;
+}
+
+#logs-wrapper > p {
+    color: #32ee43;
+    font-weight: bold;
+    margin: 0;
+    font-size: 13px;
+}
+
+.console-header {
+    color: #ee5432 !important;
+}
