@@ -1,6 +1,6 @@
 # Calculator
-Written in JavaScript using **ReactJS**
+Written in JavaScript using **React**
 
-***User Interface:***
+### User Interface
 
 ![calculator UI](../resources/calculator.png)
