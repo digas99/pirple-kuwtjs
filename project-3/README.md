@@ -1,4 +1,5 @@
 # Keeping Up With the JavaScripts - Project-3
+Created using React
 
 ### Setup
 To run the code do the following, after installing Node.js:
