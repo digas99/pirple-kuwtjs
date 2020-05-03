@@ -1,6 +1,6 @@
 # TODO list
-Written in JavaScript using **ReactJS**
+Written in JavaScript using **React**
 
-***User Interface:***
+### User Interface
 
 ![todolist UI](../resources/todolist.png)
