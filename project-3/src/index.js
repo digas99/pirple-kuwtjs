@@ -145,10 +145,6 @@ class Structure extends React.Component {
 
     // iterate over the people that haven't completed their 'journey'
     for (const person of not_completed_people) {
-      // start all over again
-      if (all_completed) {
-        all_completed = false;
-      }
       // if person is supposed to enter in this floor
       if (person.start_floor === elevator_info.floor) {
         people_entering++;
